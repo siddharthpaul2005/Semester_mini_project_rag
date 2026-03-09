@@ -8,9 +8,15 @@ from quiz_engine import generate_quiz
 from evaluation_engine import evaluate_answer
 
 from database.db import cursor, conn
-
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow React dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_FOLDER = "uploads"
 
