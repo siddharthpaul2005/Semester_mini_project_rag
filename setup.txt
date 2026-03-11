@@ -1,0 +1,100 @@
+AI Tutor - Full Setup Guide
+
+This guide covers everything required to set up the AI Tutor project from scratch on a new laptop, including prerequisites, downloading Ollama along with its specific model, and running the backend and frontend.
+
+### Prerequisites
+Before you begin, ensure you have the following installed on your new laptop:
+1. Git (to download the repository)
+2. Python 3.10+ (to run the backend API)
+3. Node.js (18+ recommended) and npm (to run the React frontend)
+4. Ollama (to run the local AI language model)
+
+---
+
+### Step 1: Download the Codebase
+Open your terminal (or Command Prompt / PowerShell) and run the following command to download the code from GitHub.
+```bash
+git clone https://github.com/siddharthpaul2005/Semester_mini_project_rag.git
+cd Semester_mini_project_rag
+```
+*(Note: Replace `<YOUR_GITHUB_REPO_URL>` with your actual remote GitHub repository URL that hosts this project).*
+
+---
+
+### Step 2: Download and Setup Ollama
+The application relies on Ollama to locally serve the AI tutor model (`deepseek-r1:8b`).
+1. Go to https://ollama.com/download and install Ollama for your specific operating system.
+2. Once installed and Ollama is properly running in the background, open a new terminal window.
+3. Run the following command to pull and run the exact model hardcoded in the application's backend configuration:
+```bash
+ollama run deepseek-r1:8b
+```
+Wait for the initial large download to finish. Once it brings up an interactive prompt (`>>>`), you can type `/bye` to exit or leave it running in the background. As long as the Ollama app is running on your machine, the backend will be able to interface with it effortlessly at `http://localhost:11434`.
+
+---
+
+### Step 3: Set Up and Run the Backend (FastAPI)
+Next, we will set up the Python backend which uses FastAPI, LangChain, SentenceTransformers, and ChromaDB.
+
+1. Open a new terminal and navigate to the `backend` directory from the root of your project:
+```bash
+cd backend
+```
+
+2. (Highly Recommended) Create a virtual environment to manage backend dependencies:
+```bash
+python -m venv venv
+```
+
+3. Activate the virtual environment:
+- On Windows:
+```cmd
+venv\Scripts\activate
+```
+- On Mac/Linux:
+```bash
+source venv/bin/activate
+```
+
+4. Install all the required Python packages (including FastAPI, uvicorn, requests, langchain, sentence-transformers, chromadb, etc.):
+```bash
+pip install -r requirements.txt
+```
+
+5. Once the installation is complete, start the backend server:
+```bash
+uvicorn main:app --reload
+```
+The backend should now be running successfully. You will see terminal logs indicating the API server is running at `http://127.0.0.1:8000`.
+
+*(Note: The first time you run the backend or upload a PDF document, Python will automatically download the `BAAI/bge-small-en` embeddings model from Hugging Face required by the RAG pipeline).*
+
+---
+
+### Step 4: Set Up and Run the Frontend (React + Vite)
+Finally, we set up the React-based frontend.
+
+1. Open a **new** terminal (make sure to keep the backend server terminal running) and navigate to the `frontend` directory:
+```bash
+cd frontend
+```
+
+2. Install all the required Node modules:
+```bash
+npm install
+```
+
+3. Start the Vite development server:
+```bash
+npm run dev
+```
+
+4. Your terminal will output a local frontend URL (typically `http://localhost:5173`). Open this URL in your web browser to start using the AI Tutor platform.
+
+---
+
+### Summary Checklist to Use the App
+Every time you want to use the application in the future, you must ensure three things are running simultaneously:
+1. **Ollama**: App running in the background (or model served via terminal).
+2. **Backend**: Terminal running `uvicorn main:app --reload` from within the activated virtual environment inside the `backend` folder.
+3. **Frontend**: Terminal running `npm run dev` inside the `frontend` folder.
