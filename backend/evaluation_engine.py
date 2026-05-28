@@ -19,14 +19,20 @@ Student Answer:
 Give score from 0 to 10 and feedback.
 """
 
-    response = requests.post(
-        OLLAMA_URL,
-        json={
-            "model": MODEL_NAME,
-            "prompt": prompt,
-            "stream": False
-        }
-    )
+    try:
+        response = requests.post(
+            OLLAMA_URL,
+            json={
+                "model": MODEL_NAME,
+                "prompt": prompt,
+                "stream": False
+            }
+        )
+        response.raise_for_status()
+    except requests.exceptions.ConnectionError:
+        return "Error: Could not connect to the local LLM. Please make sure Ollama is running (open the Ollama app or run 'ollama serve' in your terminal)."
+    except requests.exceptions.RequestException as e:
+        return f"Error communicating with LLM: {str(e)}"
 
     data = response.json()
 

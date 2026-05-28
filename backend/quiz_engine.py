@@ -32,14 +32,20 @@ Format:
 }}
 """
 
-    response = requests.post(
-        OLLAMA_URL,
-        json={
-            "model": MODEL_NAME,
-            "prompt": prompt,
-            "stream": False
-        }
-    )
+    try:
+        response = requests.post(
+            OLLAMA_URL,
+            json={
+                "model": MODEL_NAME,
+                "prompt": prompt,
+                "stream": False
+            }
+        )
+        response.raise_for_status()
+    except requests.exceptions.ConnectionError:
+        return {"error": "Could not connect to the local LLM. Please make sure Ollama is running (open the Ollama app or run 'ollama serve' in your terminal)."}
+    except requests.exceptions.RequestException as e:
+        return {"error": f"Error communicating with LLM: {str(e)}"}
 
     data = response.json()
 
@@ -51,7 +57,13 @@ Format:
     if not json_match:
         return {"error": "Model did not return JSON"}
 
-    quiz = json.loads(json_match.group())
+    try:
+        quiz = json.loads(json_match.group())
+    except json.JSONDecodeError:
+        return {"error": "Model returned invalid JSON"}
+
+    if "questions" not in quiz:
+        return {"error": "Model response missing 'questions' key"}
 
     # store answers
     for q in quiz["questions"]:
@@ -60,7 +72,7 @@ Format:
             INSERT INTO quiz_questions(topic, question, correct_answer)
             VALUES(?,?,?)
             """,
-            (topic, q["question"], q["answer"])
+            (topic, q.get("question", ""), q.get("answer", ""))
         )
 
     conn.commit()
